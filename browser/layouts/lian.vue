@@ -29,6 +29,8 @@
     >
       {{ kanbanSubText }}
     </div>
+
+    <nuxt />
   </div>
 </template>
 
@@ -37,8 +39,8 @@
         name: "lian",
         data() {
             return {
-              kanban: "https://myfilegal.cn/images/%E6%B6%9F2.png",
-              bg: "https://myfilegal.cn/images/bg.jpg",
+              kanban: "https://myfilegal.cn/images/xtt/%E6%B6%9F2.png",
+              bg: "https://myfilegal.cn/images/xtt/bg.jpg",
               kanbanAreaTop: "calc(100vh - 220px)",
               kanbanAreaLeft: "calc(100vw - 170px)",
               kanbanText: "",
@@ -165,13 +167,16 @@
         },
         mounted() {
           const self = this;
-          document.addEventListener("visibilitychange", this.kanbanVisibility);
+          const kanbanEL = this.$refs.kanbanArea;
 
+          // 监听图片显隐
+          document.addEventListener("visibilitychange", this.kanbanVisibility);
           let kanbanShow = new IntersectionObserver(this.kanbanShow, {
             threshold: [0, .25, .5, .75, 1]
           });
           kanbanShow.observe(this.$refs.kanbanArea);
 
+          // 拖拽图片
           document.addEventListener("dragover", function( event ) {
             event.preventDefault();
           }, false);
@@ -179,11 +184,13 @@
             let file = event.dataTransfer.files[0],
               reader = new FileReader();
 
-            reader.readAsDataURL(file);
-            reader.onload = function() {
-              self.bg = this.result;
-              self.$refs.bg.style.backgroundImage = "url('" + this.result + "')";
-              localStorage.setItem("bg", this.result);
+            if(file.type.includes("image")) {
+              reader.readAsDataURL(file);
+              reader.onload = function() {
+                self.bg = this.result;
+                self.$refs.bg.style.backgroundImage = "url('" + this.result + "')";
+                localStorage.setItem("bg", this.result);
+              }
             }
             event.preventDefault();
           });
@@ -232,6 +239,7 @@
   width: 100vw;
   height: 100vh;
   background-size: cover;
+  z-index: -9;
 }
 .bg-mark {
   position: fixed;
@@ -239,5 +247,6 @@
   width: 100vw;
   height: 100vh;
   background-color: #fffc;
+  z-index: -8;
 }
 </style>

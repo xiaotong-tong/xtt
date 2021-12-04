@@ -5,17 +5,17 @@ const path = require("path");
 
 export default {
   head: {
-    title: '小恸恸',
+    title: '小恸恸的小窝',
     htmlAttrs: {
-      lang: 'zh-cn'
+      lang: 'zh-CN'
     },
     meta: [
       { charset: 'utf-8' },
       { name: 'viewport', content: 'width=device-width, initial-scale=1' },
-      { hid: 'description', name: 'mygal', content: 'gal,美少女游戏,视觉小说,' }
+      { hid: 'description', name: '小恸恸', content: 'gal,blog,サザナミ' }
     ],
     link: [
-      { rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' }
+      { rel: 'icon', type: 'image/x-icon', href: '/漣.ico' }
     ]
   },
   css: [
