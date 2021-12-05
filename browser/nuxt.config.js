@@ -15,7 +15,7 @@ export default {
       { hid: 'description', name: '小恸恸', content: 'gal,blog,サザナミ' }
     ],
     link: [
-      { rel: 'icon', type: 'image/x-icon', href: '/漣.ico' }
+      { rel: 'icon', type: 'image/x-icon', href: '/lian.ico' }
     ]
   },
   css: [

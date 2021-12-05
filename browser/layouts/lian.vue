@@ -51,7 +51,11 @@
                 Y: 0,
                 X: 0
               },
-              iskanbanShow: true
+              iskanbanShow: {
+                startState: 1,
+                runState: false,
+                isBack: false
+              }
             }
         },
         methods: {
@@ -65,7 +69,7 @@
                 opacity: 0,
                 transition: "opacity 5s 3s"
               }
-            }, 0);
+            }, 100);
           },
           kanbanLoad() {
             const self = this,
@@ -117,51 +121,105 @@
           kanbanShow(entries) {
             const data = entries[0],
               kanbanSub = this.$refs.kanbanSubText,
-              kanbanEL = this.$refs.kanbanArea;
+              kanbanEL = this.$refs.kanbanArea,
+              // hidden01234 从显示到隐藏 1 .75 .5 .25 0
+              // show01234 从隐藏到显示 0 .25 .5 .75 1
+              visibilityText = {
+                hidden0: '',
+                hidden1: "是要和涟玩捉迷藏吗？",
+                hidden2: "涟准备藏好一点，不要被找到了",
+                hidden3: "这个位置还可以，再找找其他地方吧",
+                hidden4: "嘿嘿~涟感觉藏这个位置不错，哥哥肯定找不到的！",
+                hidden5: "哥哥快来找我呀~",
+                show0: "哥哥怎么还不来找我呀",
+                show1: "看不见我 看不见我",
+                show2: "看不见我 看不见我 看不见我",
+                show3: "被发现拉，哥哥是怎么找到我的呢？",
+                show4: "哥哥快拉我出去啦~",
+                show5: "fu~ 好开心~"
+              };
 
             if (!kanbanSub) { return; }
             kanbanSub.style.opacity = 1;
             kanbanSub.style.transition = "";
 
-            if (data.intersectionRatio > 0 && data.intersectionRatio < 1) {
-              this.kanbanText = "";
-              this.kanbanSubText = "要被消失掉了！不要啊！！！";
-              
-              if ((data.boundingClientRect.left + data.boundingClientRect.width) > data.rootBounds.width) {
-                kanbanSub.style.left = "";
-                kanbanSub.style.right = "20px";
-              } else if(data.boundingClientRect.left < 0) {
-                kanbanSub.style.left = "20px";
-                kanbanSub.style.right = "";
-              } else {
-                kanbanSub.style.left = data.boundingClientRect.left + "px";
-              }
+            switch(true) {
+              case data.intersectionRatio >= 1: {
+                if (this.iskanbanShow.runState && this.iskanbanShow.isBack) {
+                  this.kanbanText = visibilityText.show5;
+                  this.kanbanSubText = "";
+                  this.textHidden(this);
 
-              if (data.boundingClientRect.top < 0) {
-                kanbanSub.style.top = "60px";
-                kanbanSub.style.left = data.boundingClientRect.left - 150 + "px";
-              } else {
-                kanbanSub.style.top = data.boundingClientRect.top + "px";
+                  kanbanSub.style.opacity = 0;
+                  this.iskanbanShow.isBack = false;
+                }
+                this.iskanbanShow.runState= false;
+                break;
               }
-              this.iskanbanShow = false;
+              case data.intersectionRatio >= .75: {
+                this.kanbanText = "";
+                this.kanbanSubText = this.iskanbanShow.isBack ? visibilityText.show4 : visibilityText.hidden1;
+                
+                this.kanbanSubPosition(data);
+                this.iskanbanShow.runState= true;
+                break;
+              }
+              case data.intersectionRatio >= .5: {
+                this.kanbanText = "";
+                this.kanbanSubText = this.iskanbanShow.isBack ? visibilityText.show3 : visibilityText.hidden2;
+                
+                this.kanbanSubPosition(data);
+                this.iskanbanShow.runState= true;
+                break;
+              }
+              case data.intersectionRatio >= .25: {
+                this.kanbanText = "";
+                this.kanbanSubText = this.iskanbanShow.isBack ? visibilityText.show2 : visibilityText.hidden3;
+                
+                this.kanbanSubPosition(data);
+                this.iskanbanShow.runState= true;
+                break;
+              }
+              case data.intersectionRatio > 0: {
+                this.kanbanText = "";
+                this.kanbanSubText = this.iskanbanShow.isBack ? visibilityText.show1 : visibilityText.hidden4;
+                
+                this.kanbanSubPosition(data);
+                this.iskanbanShow.runState= true;
+                break;
+              }
+              case data.intersectionRatio <= 0: {
+                if (this.iskanbanShow.runState) {
+                  this.kanbanSubText = this.iskanbanShow.isBack ? visibilityText.show0 : visibilityText.hidden5;
+                  kanbanSub.style.top = data.boundingClientRect.top + "px";
+                  kanbanSub.style.right = "20px";
+                  kanbanSub.style.opacity = 0;
+                  kanbanSub.style.transition = "opacity 5s 3s";
+                }
+                // this.iskanbanShow.runState = false;
+                this.iskanbanShow.isBack = true;
+                break;
+              }
+            }
+          },
+          kanbanSubPosition(data) { 
+            const kanbanSub = this.$refs.kanbanSubText;
 
-            } else if (data.intersectionRatio >= 1) {
-              if (!this.iskanbanShow) {
-                this.kanbanText = "fu~ 得救了~";
-                this.kanbanSubText = "";
-                this.textHidden(this);
+            if ((data.boundingClientRect.left + data.boundingClientRect.width) > data.rootBounds.width) {
+              kanbanSub.style.left = "";
+              kanbanSub.style.right = "20px";
+            } else if(data.boundingClientRect.left < 0) {
+              kanbanSub.style.left = "20px";
+              kanbanSub.style.right = "";
+            } else {
+              kanbanSub.style.left = data.boundingClientRect.left + "px";
+            }
 
-                kanbanSub.style.opacity = 0;
-              }
-              this.iskanbanShow = true;
-            } else if (data.intersectionRatio <= 0) {
-              if (!this.iskanbanShow) {
-                this.kanbanSubText = "消失了！消失了！消失了！消失了！消失了！消失了！";
-                kanbanSub.style.top = data.boundingClientRect.top + "px";
-                kanbanSub.style.right = "20px";
-                kanbanSub.style.opacity = 0;
-                kanbanSub.style.transition = "opacity 5s 3s";
-              }
+            if (data.boundingClientRect.top < 0) {
+              kanbanSub.style.top = "60px";
+              kanbanSub.style.left = data.boundingClientRect.left - 150 + "px";
+            } else {
+              kanbanSub.style.top = data.boundingClientRect.top + "px";
             }
           }
         },

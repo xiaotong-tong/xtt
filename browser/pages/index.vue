@@ -4,7 +4,7 @@
       小恸恸的个人主页
     </h1>
     <section class="touxiang-wrap">
-      <img :src="touxiang" alt="头像" class="touxiang">
+      <img :src="touxiang" alt="头像" class="touxiang" draggable="false">
     </section>
   </div>
 </template>
