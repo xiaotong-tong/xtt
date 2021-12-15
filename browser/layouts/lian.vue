@@ -9,25 +9,25 @@
     <section
       class="kanbanArea"
       ref="kanbanArea"
-      :style="{top: (kanbanAreaTop), left: (kanbanAreaLeft)}"
-      @mousedown="kanbanMove"
-      @mousemove="kanbanMoving"
-      @mouseup="kanbanMoved"
-      @mouseout="kanbanMoved"
+      :style="kanbanAreaStyle"
+      @mousedown="imgMove"
+      @mousemove="imgMoving"
+      @mouseup="imgMoved"
+      @mouseout="imgMoved"
     >
-      <div
-        class="dialogText"
-        v-if="kanbanText"
-        :style="kanbanTextStyle">
-        {{ kanbanText }}
-      </div>
-      <img :src="kanban" alt="看板娘" class="kanban" @load="kanbanLoad" draggable="false">
+      <img :src="kanban" alt="看板娘" class="kanbanimg" @load="kanbanLoad" draggable="false">
     </section>
     <div
-      class="subDialogText"
-      ref="kanbanSubText"
+      class="kanbanText"
+      v-if="kanbanText"
+      ref="kanbanText"
+      :style="kanbanTextStyle"
+      @mousedown="textMove"
+      @mousemove="textMoving"
+      @mouseup="imgMoved"
+      @mouseout="imgMoved"
     >
-      {{ kanbanSubText }}
+      {{ kanbanText }}
     </div>
 
     <nuxt />
@@ -41,11 +41,15 @@
             return {
               kanban: "https://myfilegal.cn/images/xtt/%E6%B6%9F2.png",
               bg: "https://myfilegal.cn/images/xtt/bg.jpg",
-              kanbanAreaTop: "calc(100vh - 220px)",
-              kanbanAreaLeft: "calc(100vw - 170px)",
+              kanbanAreaStyle: {
+                top: "calc(100vh - 220px)",
+                left: "calc(100vw - 170px)",
+              },
               kanbanText: "",
-              kanbanTextStyle: {},
-              kanbanSubText: "",
+              kanbanTextStyle: {
+                top: "calc(100vh - 100px)",
+                left: "calc(100vw - 330px)",
+              },
               canMove: false,
               moveStartXY: {
                 Y: 0,
@@ -59,69 +63,114 @@
             }
         },
         methods: {
-          textHidden(self) {
-            self.kanbanTextStyle = {
-              opacity: 1,
-              transition: ""
-            };
+          textHidden() {
+            const self = this,textEL = this.$refs.kanbanText;
+
+            textEL.style.opacity = 1;
+            textEL.style.transition = "";
             setTimeout(() => {
-              self.kanbanTextStyle = {
-                opacity: 0,
-                transition: "opacity 5s 3s"
-              }
+              textEL.style.opacity = 0;
+              textEL.style.transition = "opacity 5s 3s";
             }, 100);
           },
-          kanbanLoad() {
-            const self = this,
-              kanbanEL = this.$refs.kanbanArea;
+          textShow(text) {
+            this.kanbanText = text;
 
-            if (localStorage.getItem("kanbanXY")) {
-              kanbanEL.style.top =  JSON.parse(localStorage.getItem("kanbanXY")).Y + "px";
-              kanbanEL.style.left = JSON.parse(localStorage.getItem("kanbanXY")).X + "px";
+            this.$nextTick(() => {
+              const textEL = this.$refs.kanbanText;
+              textEL.style.opacity = 1;
+              textEL.style.transition = "";
+            })
+          },
+          kanbanLoad() {
+            const imgEl = this.$refs.kanbanArea,
+              kanbanPosition = JSON.parse(localStorage.getItem("kanbanPosition"));
+
+            imgEl.style.opacity = 1;
+
+            if (kanbanPosition) {
+              imgEl.style.top = kanbanPosition.imgXY.Y + "px";
+              imgEl.style.left = kanbanPosition.imgXY.X + "px";
             }
             
-            this.kanbanText = "初次见面,我是看板娘 涟，请多多关照";
-            this.textHidden(this);
+            this.textShow("初次见面,我是看板娘 涟，请多多关照");
+            // this.textHidden();
+            this.kanbanTextLoad();
+            
+          },
+          kanbanTextLoad() {
+            this.$nextTick(() => {
+              const textEL = this.$refs.kanbanText,
+                kanbanPosition = JSON.parse(localStorage.getItem("kanbanPosition"))
+
+              if (kanbanPosition) {
+                textEL.style.top = kanbanPosition.textXY.Y + "px";
+                textEL.style.left = kanbanPosition.textXY.X + "px";
+              }
+            })
           },
           kanbanVisibility() {
-            const self = this,
-              kanbanEL = this.$refs.kanbanArea && this.$refs.kanbanArea.getBoundingClientRect();
+            const imgEL = this.$refs.kanbanArea, textEL = this.$refs.kanbanText,
+              imgPosition = imgEL?.getBoundingClientRect(),
+              textPosition = textEL?.getBoundingClientRect();
 
-            if (!kanbanEL) { return; }
+            if (!imgPosition) { return; }
             if (document.visibilityState === 'visible') {
-              this.kanbanText = "欢迎回来，要再陪涟玩一会吗?";
+              this.textShow("欢迎回来，要再陪涟玩一会吗?");
+              this.kanbanTextLoad();
             } else {
-              this.kanbanText = "要走了吗？那就下次再见啦~";
-              localStorage.setItem("kanbanXY", JSON.stringify({
-                X: kanbanEL.left,
-                Y: kanbanEL.top
-              }));
+              const position = {
+                imgXY: {
+                  X: imgPosition.left,
+                  Y: imgPosition.top
+                },
+                textXY: {
+                  X: textPosition.left,
+                  Y: textPosition.top
+                }
+              }
+              this.textShow("要走了吗？那就下次再见啦~");
+              localStorage.setItem("kanbanPosition", JSON.stringify(position));
             }
-            this.textHidden(this);
+            this.textHidden();
           },
-          kanbanMove(ev) {
-            const kanbanEL = this.$refs.kanbanArea.getBoundingClientRect();
+          imgMove(ev) {
+            const imgPosition = this.$refs.kanbanArea.getBoundingClientRect();
             this.canMove = true;
             this.moveStartXY = {
-              Y: ev.clientY - kanbanEL.top,
-              X: ev.clientX - kanbanEL.left,
+              Y: ev.clientY - imgPosition.top,
+              X: ev.clientX - imgPosition.left,
             }
           },
-          kanbanMoving(ev) {
+          textMove(ev) {
+            const textPosition = this.$refs.kanbanText.getBoundingClientRect();
+            this.canMove = true;
+            this.moveStartXY = {
+              Y: ev.clientY - textPosition.top,
+              X: ev.clientX - textPosition.left,
+            }
+          },
+          imgMoving(ev) {
             if(this.canMove) {
-              const kanbanEL = this.$refs.kanbanArea;
+              const imgEL = this.$refs.kanbanArea;
               
-              kanbanEL.style.top = ev.clientY - this.moveStartXY.Y + 'px';
-              kanbanEL.style.left = ev.clientX - this.moveStartXY.X + 'px';
+              imgEL.style.top = ev.clientY - this.moveStartXY.Y + 'px';
+              imgEL.style.left = ev.clientX - this.moveStartXY.X + 'px';
             }
           },
-          kanbanMoved(ev) {
+          textMoving(ev) {
+            if(this.canMove) {
+              const textEL = this.$refs.kanbanText;
+              
+              textEL.style.top = ev.clientY - this.moveStartXY.Y + 'px';
+              textEL.style.left = ev.clientX - this.moveStartXY.X + 'px';
+            }
+          },
+          imgMoved() {
             this.canMove = false;
           },
           kanbanShow(entries) {
             const data = entries[0],
-              kanbanSub = this.$refs.kanbanSubText,
-              kanbanEL = this.$refs.kanbanArea,
               // hidden01234 从显示到隐藏 1 .75 .5 .25 0
               // show01234 从隐藏到显示 0 .25 .5 .75 1
               visibilityText = {
@@ -139,62 +188,47 @@
                 show5: "fu~ 好开心~"
               };
 
-            if (!kanbanSub) { return; }
-            kanbanSub.style.opacity = 1;
-            kanbanSub.style.transition = "";
-
             switch(true) {
               case data.intersectionRatio >= 1: {
+                if (this.iskanbanShow.runState && !this.iskanbanShow.isBack) {
+                  break;
+                }
                 if (this.iskanbanShow.runState && this.iskanbanShow.isBack) {
-                  this.kanbanText = visibilityText.show5;
-                  this.kanbanSubText = "";
-                  this.textHidden(this);
-
-                  kanbanSub.style.opacity = 0;
+                  this.textShow(visibilityText.show5);
+                  this.textHidden();
                   this.iskanbanShow.isBack = false;
                 }
                 this.iskanbanShow.runState= false;
                 break;
               }
               case data.intersectionRatio >= .75: {
-                this.kanbanText = "";
-                this.kanbanSubText = this.iskanbanShow.isBack ? visibilityText.show4 : visibilityText.hidden1;
+                this.textShow(this.iskanbanShow.isBack ? visibilityText.show4 : visibilityText.hidden1);
                 
-                this.kanbanSubPosition(data);
                 this.iskanbanShow.runState= true;
                 break;
               }
               case data.intersectionRatio >= .5: {
-                this.kanbanText = "";
-                this.kanbanSubText = this.iskanbanShow.isBack ? visibilityText.show3 : visibilityText.hidden2;
+                this.textShow(this.iskanbanShow.isBack ? visibilityText.show3 : visibilityText.hidden2);
                 
-                this.kanbanSubPosition(data);
                 this.iskanbanShow.runState= true;
                 break;
               }
               case data.intersectionRatio >= .25: {
-                this.kanbanText = "";
-                this.kanbanSubText = this.iskanbanShow.isBack ? visibilityText.show2 : visibilityText.hidden3;
+                this.textShow(this.iskanbanShow.isBack ? visibilityText.show2 : visibilityText.hidden3);
                 
-                this.kanbanSubPosition(data);
                 this.iskanbanShow.runState= true;
                 break;
               }
               case data.intersectionRatio > 0: {
-                this.kanbanText = "";
-                this.kanbanSubText = this.iskanbanShow.isBack ? visibilityText.show1 : visibilityText.hidden4;
+                this.textShow(this.iskanbanShow.isBack ? visibilityText.show1 : visibilityText.hidden4);
                 
-                this.kanbanSubPosition(data);
                 this.iskanbanShow.runState= true;
                 break;
               }
               case data.intersectionRatio <= 0: {
                 if (this.iskanbanShow.runState) {
-                  this.kanbanSubText = this.iskanbanShow.isBack ? visibilityText.show0 : visibilityText.hidden5;
-                  kanbanSub.style.top = data.boundingClientRect.top + "px";
-                  kanbanSub.style.right = "20px";
-                  kanbanSub.style.opacity = 0;
-                  kanbanSub.style.transition = "opacity 5s 3s";
+                  this.textShow(this.iskanbanShow.isBack ? visibilityText.show0 : visibilityText.hidden5);
+                  this.textHidden();
                 }
                 // this.iskanbanShow.runState = false;
                 this.iskanbanShow.isBack = true;
@@ -202,30 +236,9 @@
               }
             }
           },
-          kanbanSubPosition(data) { 
-            const kanbanSub = this.$refs.kanbanSubText;
-
-            if ((data.boundingClientRect.left + data.boundingClientRect.width) > data.rootBounds.width) {
-              kanbanSub.style.left = "";
-              kanbanSub.style.right = "20px";
-            } else if(data.boundingClientRect.left < 0) {
-              kanbanSub.style.left = "20px";
-              kanbanSub.style.right = "";
-            } else {
-              kanbanSub.style.left = data.boundingClientRect.left + "px";
-            }
-
-            if (data.boundingClientRect.top < 0) {
-              kanbanSub.style.top = "60px";
-              kanbanSub.style.left = data.boundingClientRect.left - 150 + "px";
-            } else {
-              kanbanSub.style.top = data.boundingClientRect.top + "px";
-            }
-          }
         },
         mounted() {
           const self = this;
-          const kanbanEL = this.$refs.kanbanArea;
 
           // 监听图片显隐
           document.addEventListener("visibilitychange", this.kanbanVisibility);
@@ -255,7 +268,6 @@
           if (localStorage.getItem("bg")) {
             this.bg = localStorage.getItem("bg");
           }
-
         }
     }
 </script>
@@ -263,31 +275,19 @@
 <style scoped>
 .kanbanArea {
   position: fixed;
+  opacity: 0;
 }
-.kanban {
+.kanbanimg {
   width: 150px;
   aspect-ratio: 3 / 4;
 }
-.dialogText {
+.kanbanText {
   position: absolute;
-  top: 0;
-  left: 0;
-  transform: translateY(-100%);
-  max-width: 150px;
-  margin-bottom: 1.5em;
-  padding: .5em;
-  border: 1px solid #ccc;
-  border-radius: 5px;
-  font-size: 12px;
-}
-.subDialogText {
-  position: fixed;
   max-width: 150px;
   padding: .5em;
   border: 1px solid #ccc;
   border-radius: 5px;
   font-size: 12px;
-  transform: translateY(-100%);
 }
 
 .bg {
