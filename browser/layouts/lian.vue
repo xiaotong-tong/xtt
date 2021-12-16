@@ -239,7 +239,6 @@
         },
         mounted() {
           const self = this;
-
           // 监听图片显隐
           document.addEventListener("visibilitychange", this.kanbanVisibility);
           let kanbanShow = new IntersectionObserver(this.kanbanShow, {
