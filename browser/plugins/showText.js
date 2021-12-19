@@ -78,33 +78,55 @@ const doMatch = (match) => {
 	}
 }
 const doTextList = {
-	"文本-反转文本": (text) => {
+	"文本-反转文本"(text) {
 		const type = text.match(/>=<(.*)】/)
 		return reverseText(type[1])
 	},
-	"文本-取文本左": (text) => {
+	"文本-取文本左"(text) {
 		const type = text.match(/.*?>=<(.*)>=<(.*?)】/)
 		return getTextLeft(type[1], type[2])
 	},
-	"文本-取文本右": (text) => {
+	"文本-取文本右"(text) {
 		const type = text.match(/.*?>=<(.*)>=<(.*?)】/)
 		return getTextRight(type[1], type[2])
 	},
-	"文本-取中间": (text) => {
+	"文本-取中间"(text) {
 		const type = text.match(/.*?>=<(.*)>=<(.*?)>=<(.*?)】/)
 		return getTextCenter(type[1], type[2], type[3])
 	},
-	"文本-注音": (text) => {
+	"文本-注音"(text) {
 		const type = text.match(/.*?>=<(.*)>=<(.*?)】/)
 		return phonetic(type[1], type[2])
 	},
-	"当前时间": () => {
-		return getDate()
+	"当前时间"(text) {
+		const type = text.match(/>=<(.*)】/)
+		return getDate(+new Date(), type && type[1])
 	},
-	"返回": (text) => {
+	"返回"(text) {
 		const type = text.match(/>=<(.*)】/)
 		backText = type[1]
 		return ''
+	},
+	"选择"(text) {
+		const type = text.match(/(?<=>=<)[\s\S]*?(?=>=<|】$)/g)
+		let choiseList = [], balance = 0, cacheList = []
+
+		type.forEach((item, i) => {
+			if (item.match(/【|】/)) {
+				balance += (item.match(/【/g) || []).length				
+				balance -= (item.match(/】/g) || []).length
+				cacheList.push(item)
+				if (balance === 0) {
+					choiseList.push(cacheList.join(">=<"))
+					cacheList = []
+				}
+			} else if (balance) {
+				cacheList.push(item)
+			} else {
+				choiseList.push(item)
+			}
+		})
+		return choice(choiseList[0], choiseList)
 	}
 }
 
@@ -135,15 +157,32 @@ const phonetic = (text, pinyin) => {
 	return `{{{注音-${text}-${pinyin}}}}`
 }
 
-const getDate = (newdate = +new Date()) => {
+const getDate = (newdate = +new Date(), type) => {
 	const date = new Date(newdate),
 			year = date.getFullYear(),
 			month = date.getMonth() + 1,
 			day = date.getDate().toString().padStart(2, '0'),
 			hour = date.getHours().toString().padStart(2, '0'),
 			minutes = date.getMinutes().toString().padStart(2, '0'),
-			seconds = date.getSeconds().toString().padStart(2, '0');
-	return `${year}-${month}-${day} ${hour}:${minutes}:${seconds}`;
+			seconds = date.getSeconds().toString().padStart(2, '0')
+
+	let resDate
+	switch (type) {
+		case "时":
+			resDate = hour
+			break
+		case "分":
+			resDate = minutes
+			break
+		default:
+			resDate = `${year}-${month}-${day} ${hour}:${minutes}:${seconds}`
+			break
+		}
+	return resDate
+}
+
+const choice = (stamp, choiceList) => {
+	return textReplace(choiceList[parseInt(textReplace(stamp))])
 }
 
 export default showText
