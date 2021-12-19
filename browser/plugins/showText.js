@@ -1,18 +1,18 @@
 let errorOutput
 let backText
 
-const matchReg = new RegExp("【.*】")
+const matchReg = new RegExp("【[\\s\\S]*】")
 const showText = (text) => {
 	let resText = textReplace(text)
 
-	let matches = resText.match(/{{{(.*)}}}/g)
+	let matches = resText.match(/{{{([\s\S]*)}}}/g)
 	matches?.forEach((matchText) => {
 		resText = resText.replace(matchText, showTextReplace)
 	})
 	return errorOutput || resText
 }
 const showTextReplace = (text) => {
-	const type = text.match(/{{{(.*?)-(?:.*?)}}}/)
+	const type = text.match(/{{{([\s\S]*?)-(?:[\s\S]*?)}}}/)
 	if (type && doShowList[type[1]]) {
 		return doShowList[type[1]](type.input)
 	} else {
@@ -21,7 +21,7 @@ const showTextReplace = (text) => {
 }
 const doShowList = {
 	"注音": (text) => {
-		const type = text.match(/{{{(?:.*?)-(.*?)-(.*)}}}/)
+		const type = text.match(/{{{(?:[\s\S]*?)-([\s\S]*?)-([\s\S]*)}}}/)
 		return replaceZhuyin(type[1], type[2])
 	}
 }
@@ -70,7 +70,7 @@ const textReplace = (text) => {
 	return text
 }
 const doMatch = (match) => {
-	const type = match.match(/【(.*?)(?:>=<|】)/)
+	const type = match.match(/【([\s\S]*?)(?:>=<|】)/)
 	if (type && doTextList[type[1]]) {
 		return doTextList[type[1]](type.input)
 	} else {
@@ -79,31 +79,31 @@ const doMatch = (match) => {
 }
 const doTextList = {
 	"文本-反转文本"(text) {
-		const type = text.match(/>=<(.*)】/)
+		const type = text.match(/>=<([\s\S]*)】/)
 		return reverseText(type[1])
 	},
 	"文本-取文本左"(text) {
-		const type = text.match(/.*?>=<(.*)>=<(.*?)】/)
+		const type = text.match(/[\s\S]*?>=<([\s\S]*)>=<([\s\S]*?)】/)
 		return getTextLeft(type[1], type[2])
 	},
 	"文本-取文本右"(text) {
-		const type = text.match(/.*?>=<(.*)>=<(.*?)】/)
+		const type = text.match(/[\s\S]*?>=<([\s\S]*)>=<([\s\S]*?)】/)
 		return getTextRight(type[1], type[2])
 	},
 	"文本-取中间"(text) {
-		const type = text.match(/.*?>=<(.*)>=<(.*?)>=<(.*?)】/)
+		const type = text.match(/[\s\S]*?>=<([\s\S]*)>=<([\s\S]*?)>=<([\s\S]*?)】/)
 		return getTextCenter(type[1], type[2], type[3])
 	},
 	"文本-注音"(text) {
-		const type = text.match(/.*?>=<(.*)>=<(.*?)】/)
+		const type = text.match(/[\s\S]*?>=<([\s\S]*)>=<([\s\S]*?)】/)
 		return phonetic(type[1], type[2])
 	},
 	"当前时间"(text) {
-		const type = text.match(/>=<(.*)】/)
+		const type = text.match(/>=<([\s\S]*)】/)
 		return getDate(+new Date(), type && type[1])
 	},
 	"返回"(text) {
-		const type = text.match(/>=<(.*)】/)
+		const type = text.match(/>=<([\s\S]*)】/)
 		backText = type[1]
 		return ''
 	},
@@ -132,7 +132,7 @@ const doTextList = {
 
 const reverseText = (text) => {
 	let resText = ''
-	textReplace(text).split(/({{{.*?}}})/).forEach((text) => resText += /{{{.*}}}/.test(text) ? text : text.split("").reverse().join(""))
+	textReplace(text).split(/({{{[\s\S]*?}}})/).forEach((text) => resText += /{{{[\s\S]*}}}/.test(text) ? text : text.split("").reverse().join(""))
 	return resText
 }
 
@@ -144,7 +144,7 @@ const getTextRight = (text, stamp) => {
 	return resText.substring(resText.indexOf(stamp) + 1)
 }
 const getTextCenter = (text, leftStamp, rightStamp) => {
-	const centerReg = new RegExp(`${leftStamp}(.*?)${rightStamp}`)
+	const centerReg = new RegExp(`${leftStamp}([\s\S]*?)${rightStamp}`)
 	const resText = textReplace(text)
 	if (resText.match(centerReg)) {
 		return resText.match(centerReg)[1]
