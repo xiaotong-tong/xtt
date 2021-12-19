@@ -18,7 +18,7 @@
       <img :src="kanban" alt="看板娘" class="kanbanimg" @load="kanbanLoad" draggable="false">
     </section>
     <div
-      class="kanbanText"
+      class="kanbanText textborder1"
       v-if="kanbanText"
       ref="kanbanText"
       :style="kanbanTextStyle"
@@ -136,6 +136,7 @@
           },
           imgMove(ev) {
             const imgPosition = this.$refs.kanbanArea.getBoundingClientRect();
+            this.$refs.kanbanArea.style.cursor = "move"
             this.canMove = true;
             this.moveStartXY = {
               Y: ev.clientY - imgPosition.top,
@@ -144,6 +145,7 @@
           },
           textMove(ev) {
             const textPosition = this.$refs.kanbanText.getBoundingClientRect();
+            this.$refs.kanbanText.style.cursor = "move"
             this.canMove = true;
             this.moveStartXY = {
               Y: ev.clientY - textPosition.top,
@@ -168,6 +170,8 @@
           },
           imgMoved() {
             this.canMove = false;
+            this.$refs.kanbanArea.style.cursor = ""
+            this.$refs.kanbanText.style.cursor = ""
           },
           kanbanShow(entries) {
             const data = entries[0],
@@ -239,7 +243,6 @@
         },
         mounted() {
           const self = this;
-
           // 监听图片显隐
           document.addEventListener("visibilitychange", this.kanbanVisibility);
           let kanbanShow = new IntersectionObserver(this.kanbanShow, {
@@ -285,8 +288,6 @@
   position: absolute;
   max-width: 150px;
   padding: .5em;
-  border: 1px solid #ccc;
-  border-radius: 5px;
   font-size: 12px;
 }
 

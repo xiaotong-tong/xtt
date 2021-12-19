@@ -20,6 +20,7 @@ export default {
   },
   css: [
     '@/assets/css/common.css',
+    '@/assets/css/textborder.css',
     // { src:'element-ui/lib/theme-chalk/index.css' }
   ],
   plugins: [
