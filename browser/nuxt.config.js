@@ -5,14 +5,14 @@ const path = require("path");
 
 export default {
   head: {
-    title: '小恸恸的小窝',
+    title: '星川漣の小窝',
     htmlAttrs: {
       lang: 'zh-CN'
     },
     meta: [
       { charset: 'utf-8' },
       { name: 'viewport', content: 'width=device-width, initial-scale=1' },
-      { hid: 'description', name: '小恸恸', content: 'gal,blog,サザナミ' }
+      { hid: 'description', name: '小恸恸', content: '星川漣,小恸恸,サザナミ' }
     ],
     link: [
       { rel: 'icon', type: 'image/x-icon', href: '/lian.ico' }
