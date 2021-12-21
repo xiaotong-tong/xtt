@@ -1,7 +1,6 @@
 let errorOutput
 let backText
 
-const matchReg = new RegExp("【[\\s\\S]*】")
 const showText = (text) => {
 	let resText = textReplace(text)
 
@@ -26,15 +25,14 @@ const doShowList = {
 	}
 }
 const replaceZhuyin = (text, zhuyin) => {
-	return `<ruby>${text}<rt>${zhuyin}</rt></ruby>`
+	return `<ruby>${text}<rp>(</rp><rt>${zhuyin}</rt><rp>)</rp></ruby>`
 }
 
 const textReplace = (text) => {
-	if (matchReg.test(text)) {
+	if (/【[\s\S]*】/.test(text)) {
 		let parts = text.match(/[【】]|[^【】]+/g),
 				matches = [],
 				balance = 0
-
 		for (let i=0, j=0; i<parts.length; i++) {
 			switch (parts[i]) {
 				case "【":
@@ -77,84 +75,91 @@ const doMatch = (match) => {
 		return type.input
 	}
 }
+const doMatchList = (text) => {
+	const type = text.match(/(?<=>=<)[\s\S]*?(?=>=<|】$)/g)
+	let list = [], balance = 0, cacheList = []
+
+	type.forEach((item) => {
+		if (item.match(/【|】/)) {
+			balance += (item.match(/【/g) || []).length
+			balance -= (item.match(/】/g) || []).length
+			cacheList.push(item)
+			if (balance === 0) {
+				list.push(cacheList.join(">=<"))
+				cacheList = []
+			}
+		} else if (balance) {
+			cacheList.push(item)
+		} else {
+			list.push(item)
+		}
+	})
+	return list
+}
 const doTextList = {
 	"文本-反转文本"(text) {
 		const type = text.match(/>=<([\s\S]*)】/)
-		return reverseText(type[1])
+		return reverseText(textReplace(type[1]))
 	},
 	"文本-取文本左"(text) {
-		const type = text.match(/[\s\S]*?>=<([\s\S]*)>=<([\s\S]*?)】/)
-		return getTextLeft(type[1], type[2])
+		const textState = doMatchList(text)
+		return getTextLeft(textReplace(textState[0]), textReplace(textState[1]))
 	},
 	"文本-取文本右"(text) {
-		const type = text.match(/[\s\S]*?>=<([\s\S]*)>=<([\s\S]*?)】/)
-		return getTextRight(type[1], type[2])
+		const textState = doMatchList(text)
+		return getTextRight(textReplace(textState[0]), textReplace(textState[1]))
 	},
 	"文本-取中间"(text) {
-		const type = text.match(/[\s\S]*?>=<([\s\S]*)>=<([\s\S]*?)>=<([\s\S]*?)】/)
-		return getTextCenter(type[1], type[2], type[3])
+		const textState = doMatchList(text)
+		return getTextCenter(textReplace(textState[0]), textReplace(textState[1]), textReplace(textState[2]))
 	},
 	"文本-注音"(text) {
-		const type = text.match(/[\s\S]*?>=<([\s\S]*)>=<([\s\S]*?)】/)
-		return phonetic(type[1], type[2])
+		const textState = doMatchList(text)
+		return `{{{注音-${textReplace(textState[0])}-${textReplace(textState[1])}}}}`
 	},
 	"当前时间"(text) {
 		const type = text.match(/>=<([\s\S]*)】/)
-		return getDate(+new Date(), type && type[1])
+		return getDate(+new Date(), type && textReplace(type[1]))
 	},
 	"返回"(text) {
 		const type = text.match(/>=<([\s\S]*)】/)
-		backText = type[1]
+		backText = textReplace(type[1])
 		return ''
 	},
 	"选择"(text) {
-		const type = text.match(/(?<=>=<)[\s\S]*?(?=>=<|】$)/g)
-		let choiseList = [], balance = 0, cacheList = []
-
-		type.forEach((item, i) => {
-			if (item.match(/【|】/)) {
-				balance += (item.match(/【/g) || []).length				
-				balance -= (item.match(/】/g) || []).length
-				cacheList.push(item)
-				if (balance === 0) {
-					choiseList.push(cacheList.join(">=<"))
-					cacheList = []
-				}
-			} else if (balance) {
-				cacheList.push(item)
-			} else {
-				choiseList.push(item)
-			}
-		})
-		return choice(choiseList[0], choiseList)
+		const choiceList = doMatchList(text)
+		return textReplace(choiceList[parseInt(textReplace(choiceList[0]))])
+	},
+	"判断"(text) {
+		const choiceList = doMatchList(text)
+		return Function("return " + textReplace(choiceList[0]))() ? textReplace(choiceList[1]) : textReplace(choiceList[2])
+	},
+	"随机数"(text) {
+		const minMax = doMatchList(text)
+		return getRandom(textReplace(minMax[0]), textReplace(minMax[1]))
 	}
 }
 
 const reverseText = (text) => {
 	let resText = ''
-	textReplace(text).split(/({{{[\s\S]*?}}})/).forEach((text) => resText += /{{{[\s\S]*}}}/.test(text) ? text : text.split("").reverse().join(""))
+	text.split(/({{{[\s\S]*?}}})/).forEach((text) => resText += /{{{[\s\S]*}}}/.test(text) ? text : text.split("").reverse().join(""))
 	return resText
 }
 
 const getTextLeft = (text, stamp) => {
-	return textReplace(text).split(stamp)[0]
+	return text.split(stamp)[0]
 }
 const getTextRight = (text, stamp) => {
-	const resText = textReplace(text)
-	return resText.substring(resText.indexOf(stamp) + 1)
+	return text.substring(text.indexOf(stamp) + 1)
 }
 const getTextCenter = (text, leftStamp, rightStamp) => {
-	const centerReg = new RegExp(`${leftStamp}([\s\S]*?)${rightStamp}`)
-	const resText = textReplace(text)
-	if (resText.match(centerReg)) {
-		return resText.match(centerReg)[1]
+	const centerReg = new RegExp(`${leftStamp}([\\s\\S]*?)${rightStamp}`)
+	if (text.match(centerReg)) {
+		return text.match(centerReg)[1]
 	} else {
 		errorOutput = "没有找到想要的文本呢~是不是输错了呢？"
-		return text
+		return ''
 	}
-}
-const phonetic = (text, pinyin) => {
-	return `{{{注音-${text}-${pinyin}}}}`
 }
 
 const getDate = (newdate = +new Date(), type) => {
@@ -177,14 +182,12 @@ const getDate = (newdate = +new Date(), type) => {
 		default:
 			resDate = `${year}-${month}-${day} ${hour}:${minutes}:${seconds}`
 			break
-		}
+	}
 	return resDate
 }
 
-const choice = (stamp, choiceList) => {
-	return textReplace(choiceList[parseInt(textReplace(stamp))])
+const getRandom = (min, max) => {
+	return Math.floor(Math.random() * (parseInt(max) - parseInt(min) + 1) + parseInt(min));
 }
 
 export default showText
-
-// document.body.insertAdjacentHTML("beforeend", errorOutput || output)

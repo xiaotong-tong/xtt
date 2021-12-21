@@ -17,7 +17,7 @@
 export default {
   data() {
     return {
-      touxiang: "https://myfilegal.cn/images/xtt/lian-title.png"
+      touxiang: "images/lian-title.png"
     }
   },
   layout: 'lian'
