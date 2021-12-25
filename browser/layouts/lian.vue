@@ -37,8 +37,12 @@
       class="kanbanText textborder1"
       v-show="isOperatingMenu"
       ref="operatingMenu"
+      @mousedown="textMove"
+      @mousemove="textMoving"
+      @mouseup="imgMoved"
+      @mouseout="imgMoved"
     >
-      <OperatingMenu></OperatingMenu>
+      <OperatingMenu @closeMenu="closeOperatingMenu"></OperatingMenu>
     </div>
     <nuxt />
   </div>
@@ -115,7 +119,9 @@ import OperatingMenu from "~/components/operatingMenu.vue";
             });
         },
         kanbanVisibility() {
-            const imgEL = this.$refs.kanbanArea, textEL = this.$refs.kanbanText, imgPosition = imgEL?.getBoundingClientRect(), textPosition = textEL?.getBoundingClientRect();
+            const imgEL = this.$refs.kanbanArea, textEL = this.$refs[this.isOperatingMenu ? "operatingMenu" : "kanbanText"],
+                imgPosition = imgEL?.getBoundingClientRect(), textPosition = textEL?.getBoundingClientRect();
+
             if (!imgPosition) {
                 return;
             }
@@ -149,7 +155,7 @@ import OperatingMenu from "~/components/operatingMenu.vue";
             };
         },
         textMove(ev) {
-            const textPosition = this.$refs.kanbanText.getBoundingClientRect();
+            const textPosition = this.$refs[this.isOperatingMenu ? "operatingMenu" : "kanbanText"]?.getBoundingClientRect();
             this.$refs.kanbanText.style.cursor = "move";
             this.canMove = true;
             this.moveStartXY = {
@@ -166,7 +172,7 @@ import OperatingMenu from "~/components/operatingMenu.vue";
         },
         textMoving(ev) {
             if (this.canMove) {
-                const textEL = this.$refs.kanbanText;
+                const textEL = this.$refs[this.isOperatingMenu ? "operatingMenu" : "kanbanText"];
                 textEL.style.top = ev.clientY - this.moveStartXY.Y + "px";
                 textEL.style.left = ev.clientX - this.moveStartXY.X + "px";
             }
@@ -245,6 +251,9 @@ import OperatingMenu from "~/components/operatingMenu.vue";
           this.isOperatingMenu = true;
           menu.style.top = parseInt(textEl.style.top) - 170 + "px"
           menu.style.left = parseInt(textEl.style.left) - 20 + "px"
+        },
+        closeOperatingMenu() {
+            this.isOperatingMenu = false;
         }
     },
     mounted() {
@@ -261,7 +270,7 @@ import OperatingMenu from "~/components/operatingMenu.vue";
         }, false);
         document.addEventListener("drop", function (event) {
             let file = event.dataTransfer.files[0], reader = new FileReader();
-            if (file.type.includes("image")) {
+            if (file?.type.includes("image")) {
                 reader.readAsDataURL(file);
                 reader.onload = function () {
                     self.bg = this.result;

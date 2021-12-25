@@ -3,7 +3,13 @@
     <div class="title">
         有什么事呢？
     </div>
-    <div class="closeMenuLink">
+    <div class="main">
+        内容区
+    </div>
+    <div
+        class="closeMenuLink"
+        @click="closeMenu"
+    >
         没什么事
     </div>
   </div>
@@ -14,14 +20,23 @@ export default {
     data() {
         return {
         }
+    },
+    methods: {
+        closeMenu(ev) {
+            this.$emit("closeMenu");
+            ev.preventDefault();
+        }
     }
 }
 </script>
 
 <style>
 .operatingMenuContainer {
+    display: flex;
     width: 200px;
     height: 300px;
+    flex-direction: column;
+    justify-content: space-between;
 }
 .title {
     margin-bottom: .5em;
