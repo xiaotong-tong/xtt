@@ -10,13 +10,25 @@
         <!-- 【选择>=<【文本-反转文本>=<【文本-反转文本>=<【当前时间>=<时】】】>=<1点了>=<2点了>=<3点了>=<4点了>=<5点了>=<6点了>=<7点了>=<8点了>=<9点了>=<10点了>=<11点了>=<12点了】 -->
         </div>
         <button
+          class="copyBtn"
+          @click="copyInputText"
+        >复制</button>
+        <button
           @click="clickOK"
         >确定</button>
       </section>
       <section class="outputArea">
         输出区域:
-        <div class="outputfield textborder1" v-html="outputText">
+        <div
+          class="outputfield textborder1"
+          v-html="outputText"
+          ref="outputfield"
+        >
         </div>
+        <button
+          class="copyBtn"
+          @click="copyOutputText"
+        >复制</button>
       </section>
       <section class="helpArea">
         <ul>
@@ -67,6 +79,16 @@ export default {
       this.inputText = inputEl.innerText;
 
       this.outputText = this.$showText.showText(this.inputText);
+    },
+    async copyInputText() {
+      const res = await navigator.clipboard?.writeText(this.$refs.inputfield.innerText)
+      console.log("复制成功啦");
+    },
+    async copyOutputText() {
+      const res = await navigator.clipboard?.write(
+        [new ClipboardItem({'text/html': new Blob([this.$refs.outputfield.innerHTML], {type: 'text/html'})})]
+        )
+      console.log("复制成功啦");
     }
   }
 }
@@ -81,6 +103,7 @@ export default {
 }
 .inputArea,
 .outputArea {
+  position: relative;
   margin-bottom: 30px;
   padding: .5em;
 }
@@ -107,5 +130,12 @@ export default {
 }
 .helpArea li {
   margin-bottom: 1em;
+}
+.copyBtn {
+  all: unset;
+  color: var(--bg-color-blue);
+  position: absolute;
+  top: 2em;
+  right: 1em;
 }
 </style>

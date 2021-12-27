@@ -4,7 +4,14 @@
         有什么事呢？
     </div>
     <div class="main">
-        内容区
+        <ul>
+          <li>
+              <a href="/text">文本操作类</a>
+          </li>
+          <li>
+              <a href="/">首页</a>
+          </li>
+      </ul>
     </div>
     <div
         class="closeMenuLink"
@@ -37,6 +44,9 @@ export default {
     height: 300px;
     flex-direction: column;
     justify-content: space-between;
+}
+.main {
+    flex: 1;
 }
 .title {
     margin-bottom: .5em;
