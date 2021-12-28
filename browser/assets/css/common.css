@@ -1,3 +1,7 @@
+:root {
+    --color-blue: #26c4fb;
+}
+
 body,h1,h2,h3,h4,h5,h6 {
     margin: 0;
 }
@@ -22,9 +26,6 @@ table {
     border-spacing: 0;
 }
 
-:root {
-    --bg-color-blue: #26c4fb;
-}
 .not-show {
     position: absolute;
     visibility: hidden;

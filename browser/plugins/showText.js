@@ -1,5 +1,6 @@
 let errorOutput
 let backText
+let variableList = {}
 
 const showText = (text) => {
 	let resText = textReplace(text)
@@ -78,6 +79,7 @@ const doMatch = (match) => {
 const doMatchList = (text) => {
 	const type = text.match(/(?<=>=<)[\s\S]*?(?=>=<|】$)/g)
 	let list = [], balance = 0, cacheList = []
+	if (!type) { return [text] }
 
 	type.forEach((item) => {
 		if (item.match(/【|】/)) {
@@ -113,6 +115,10 @@ const doTextList = {
 		const textState = doMatchList(text)
 		return getTextCenter(textReplace(textState[0]), textReplace(textState[1]), textReplace(textState[2]))
 	},
+	"文本-取出数字"(text) {
+		const textState = doMatchList(text)
+		return getTextNum(textReplace(textState[0]))
+	},
 	"文本-注音"(text) {
 		const textState = doMatchList(text)
 		return `{{{注音-${textReplace(textState[0])}-${textReplace(textState[1])}}}}`
@@ -128,7 +134,7 @@ const doTextList = {
 	},
 	"选择"(text) {
 		const choiceList = doMatchList(text)
-		return textReplace(choiceList[parseInt(textReplace(choiceList[0]))])
+		return textReplace(choiceList[getTextNum(textReplace(choiceList[0]))])
 	},
 	"判断"(text) {
 		const choiceList = doMatchList(text)
@@ -136,8 +142,35 @@ const doTextList = {
 	},
 	"随机数"(text) {
 		const minMax = doMatchList(text)
-		return getRandom(textReplace(minMax[0]), textReplace(minMax[1]))
+		return getRandom(getTextNum(textReplace(minMax[0])), getTextNum(textReplace(minMax[1])))
+	},
+	"权重随机数"(text) {
+		const type = doMatchList(text)
+		const textList = textReplace(type[0]).split(/[,，]/)
+		const weightList = textReplace(type[1]).split(/[,，]/).map(v => parseInt(getTextNum(v)))
+		const count = weightList.reduce((a,b) => a+b)
+		const r = getRandom(1, count)
+		let sum = 0
+		for (let i = 0; i < textList.length; i++) {
+			sum += weightList[i]
+			if (r <= sum) {
+				return textList[i]
+			}
+		}
+	},
+	"变量"(text) {
+		const type = doMatchList(text)
+		if (type.length === 1) {
+			return variableList[textReplace(type[0])]
+		} else if (type.length > 1) {
+			variableList[textReplace(type[0])] = textReplace(type[1])
+			return ''
+		}
 	}
+}
+
+const getTextNum = (text) => {
+	return text.replace(/\D/g, '')
 }
 
 const reverseText = (text) => {

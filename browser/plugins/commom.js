@@ -7,9 +7,6 @@ let data= {
         	oss: process.env.API_FILE_HOST
         }
         Vue.prototype.DateTime = {
-            // 传入一个日期，返回传入日期的中文表示
-            // 返回格式为 *年*月*日
-            // 传入为空则返回空
             toCnDate: (newdate) => {
                 if (!newdate) { return '' }
 
