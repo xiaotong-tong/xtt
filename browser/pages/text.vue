@@ -133,7 +133,7 @@ export default {
 }
 .copyBtn {
   all: unset;
-  color: var(--bg-color-blue);
+  color: var(--color-blue);
   position: absolute;
   top: 2em;
   right: 1em;

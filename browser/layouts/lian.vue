@@ -42,7 +42,7 @@
       @mouseup="imgMoved"
       @mouseout="imgMoved"
     >
-      <OperatingMenu @closeMenu="closeOperatingMenu"></OperatingMenu>
+      <OperatingMenu @closeMenu="closeOperatingMenu" @changImg="changeKanBanImg"></OperatingMenu>
     </div>
     <nuxt />
   </div>
@@ -254,6 +254,14 @@ import OperatingMenu from "~/components/operatingMenu.vue";
         },
         closeOperatingMenu() {
             this.isOperatingMenu = false;
+        },
+        changeKanBanImg() {
+            // this.kanban
+            if (this.kanban === "images/lian2.png") {
+                this.kanban = "images/lian3.png"
+            } else {
+                this.kanban = "images/lian2.png"
+            }
         }
     },
     mounted() {
@@ -283,6 +291,11 @@ import OperatingMenu from "~/components/operatingMenu.vue";
         if (localStorage.getItem("bg")) {
             this.bg = localStorage.getItem("bg");
         }
+
+        this.$refs.kanbanArea.addEventListener("contextmenu", (event) => {
+            event.preventDefault();
+            // console.log(event);
+        });
     },
     components: { OperatingMenu }
 }
