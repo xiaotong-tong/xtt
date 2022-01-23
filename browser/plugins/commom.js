@@ -14,7 +14,7 @@ let data= {
                     year = time.getFullYear(),
                     month = String(time.getMonth() + 1),
                     day = time.getDate().toString();
-            
+
                 return `${year}年${month}月${day}日`;
             }
         }

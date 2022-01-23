@@ -43,7 +43,9 @@ export default {
             this.$emit("changImg")
             ev.preventDefault();
         }
-    }
+    },
+  created() {
+  }
 }
 </script>
 
@@ -68,7 +70,7 @@ export default {
     flex: 1;
 }
 .main-footer {
-    
+
 }
 .closeMenuLink {
     display: list-item;
