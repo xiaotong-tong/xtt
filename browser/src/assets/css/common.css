@@ -1,0 +1,86 @@
+:root {
+    --color-blue: #26c4fb;
+    --bg-url: url(images/bg.png)
+}
+
+body,h1,h2,h3,h4,h5,h6 {
+    margin: 0;
+}
+th {
+    padding: 0;
+}
+li {
+    list-style: none;
+}
+ul, textarea {
+    margin: 0;
+    padding: 0;
+}
+a {
+    text-decoration: none;
+}
+textarea {
+    outline: none;
+    resize: none;
+}
+table {
+    border-spacing: 0;
+}
+
+.not-show {
+    position: absolute;
+    visibility: hidden;
+    width: 0;
+    height: 0;
+    clip-path: inset(50% 50% 50% 50%);
+    clip: rect(0 0 0 0);
+}
+.icon {
+    cursor: pointer;
+}
+
+.single-dot {
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+.rows-dot-2 {
+    display: -webkit-box;
+    overflow: hidden;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+}
+.action-dot-wrap {
+    position: relative;
+    overflow: hidden;
+}
+.action-dot {
+    overflow: hidden;
+    line-height: 1em;
+    white-space: nowrap;
+}
+.action-dot::after {
+    content: '.\A..\A...';
+    position: absolute;
+    right: 0;
+    white-space: pre;
+    animation: dot 3s steps(1) infinite normal;
+}
+@keyframes dot {
+    0% {
+        transform: translateY(0);
+    }
+    33% {
+        transform: translateY(-1em);
+    }
+    66% {
+        transform: translateY(-2em);
+    }
+    100% {
+        transform: translateY(0);
+    }
+}
+
+.outline-show {
+    outline: thin solid #2cb232;
+}
