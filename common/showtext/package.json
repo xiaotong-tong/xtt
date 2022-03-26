@@ -1,0 +1,14 @@
+{
+  "name": "showtext",
+  "version": "1.0.0",
+  "description": "",
+  "main": "showText.js",
+  "type": "commonjs",
+  "scripts": {},
+  "keywords": [],
+  "author": "xtt",
+  "license": "ISC",
+  "dependencies": {
+    "marked": "^4.0.12"
+  }
+}

@@ -1,0 +1,13 @@
+.heimu {
+    background-color: currentColor;
+    transition: background-color .2s;
+}
+.heimu:hover {
+    background-color: transparent;
+}
+
+ruby,
+rp,
+rt {
+    background-color: inherit;
+}
