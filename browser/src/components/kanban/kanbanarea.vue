@@ -22,7 +22,7 @@
       @mouseup="imgMoved"
       @mouseout="imgMoved"
     >
-      <div class="textContent" :innerHTML="kanbanText"></div>
+      <textcontent :kanbanText="kanbanText" ref="textContentEl"></textcontent>
     </div>
 
     <div
@@ -35,7 +35,6 @@
       @mouseup="imgMoved"
       @mouseout="imgMoved"
     >
-      <!-- <operatingMenu @closeMenu="closeOperatingMenu" @changImg="changeKanBanImg"></operatingMenu> -->
       <operatingMenu :closeMenu="closeOperatingMenu"></operatingMenu>
     </div>
 </template>
@@ -44,11 +43,13 @@
 import { ref, reactive, onMounted, nextTick } from 'vue';
 import kanbanimg from "./img.vue";
 import operatingMenu from "./operatingMenu.vue"
+import textcontent from './textcontent.vue';
 import { showTextBrowser } from "showText"
 
-const imgEl = ref(null);
-const textEl = ref(null);
-const operatingMenuEl = ref(null);
+const imgEl = ref();
+const textEl = ref();
+const operatingMenuEl = ref();
+const textContentEl = ref();
 
 let canMove = false;
 let kanbanAreaStyle= reactive({
@@ -262,6 +263,9 @@ onMounted(() => {
         threshold: [0, 0.25, 0.5, 0.75, 1]
     });
     intersection.observe(imgEl.value);
+
+    // 当文字区域滚动时 触发 textcontent.vue子组件中的 wheelScroll方法。
+    textEl.value.addEventListener("wheel", textContentEl.value.wheelScroll);
 })
 </script>
 
@@ -273,11 +277,9 @@ onMounted(() => {
 
 .kanbanText {
   position: absolute;
+  overflow: hidden;
   padding: .5em;
   font-size: 12px;
   cursor: inherit;
-}
-.textContent {
-  max-width: 150px;
 }
 </style>
