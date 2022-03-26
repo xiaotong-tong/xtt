@@ -3,18 +3,11 @@
     border-radius: 5px;
 }
 
-.textborder2 {
-    position: relative;
-    padding: .7em;
-    max-height: 150px;
-    overflow: hidden;
-    mask: linear-gradient(to bottom, #000 70%, transparent 98%, #000 98%, #000);
-    -webkit-mask: linear-gradient(#000 70%, transparent 98%, #000 98%, #000);
+.textborder2 .text-overflow:not(.on-scrollend) {
+    mask: linear-gradient(to bottom, #000 70%, transparent 100%);
+    -webkit-mask: linear-gradient(#000 70%, transparent 100%);
 }
-.textborder2 .textContent {
-    height: 100%;
-    overflow: hidden;
-}
+
 .textborder2::before {
     content: "";
     position: absolute;

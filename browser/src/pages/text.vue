@@ -1,4 +1,5 @@
 <template>
+    <bg></bg>
   <div class="container">
       <section class="inputArea">
         输入区域:
@@ -61,36 +62,40 @@
         </ul>
       </section>
   </div>
+  <kanbanarea></kanbanarea>
 </template>
 
-<script>
-export default {
-  data() {
-    return {
-      inputText: '',
-      outputText: ''
-    }
-  },
-  layout: 'lian',
-  methods: {
-    clickOK() {
-      const inputEl = this.$refs.inputfield
+<script setup>
+import { ref } from "vue";
+import kanbanarea from "../components/kanban/kanbanarea.vue"
+import { showTextBrowser } from "showText"
 
-      this.inputText = inputEl.innerText;
+const inputText = ref("");
+const outputText = ref("");
+const inputfield = ref(null);
+const outputfield = ref(null);
 
-      this.outputText = this.$showText.showText(this.inputText);
-    },
-    async copyInputText() {
-      const res = await navigator.clipboard?.writeText(this.$refs.inputfield.innerText)
-      console.log("复制成功啦");
-    },
-    async copyOutputText() {
-      const res = await navigator.clipboard?.write(
-        [new ClipboardItem({'text/html': new Blob([this.$refs.outputfield.innerHTML], {type: 'text/html'})})]
-        )
-      console.log("复制成功啦");
-    }
-  }
+const clickOK = () => {
+    inputText.value = inputfield.value.innerText;
+    outputText.value = showTextBrowser(inputText.value);
+}
+const copyInputText = async () => {
+    const res = await navigator.clipboard?.writeText(inputfield.value.innerText)
+    console.log("复制成功啦");
+}
+
+const copyOutputText = async () => {
+    const res = await navigator.clipboard?.write(
+        [
+            new ClipboardItem({
+                'text/html': new Blob(
+                    [outputfield.value.innerHTML],
+                    {type: 'text/html'}
+                )
+            })
+        ]
+    );
+    console.log(res)
 }
 </script>
 
