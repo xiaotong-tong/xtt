@@ -55,7 +55,9 @@ class ShowText {
             },
             "选择"(text) {
                 const choiceList = this.doTextMatchList(text);
-                return this.doReplaceToText(choiceList[ReplaceText.getTextNum(this.doReplaceToText(choiceList[0]))]);
+                let choiceNum = parseInt(ReplaceText.getTextNum(this.doReplaceToText(choiceList[0])));
+                choiceNum = choiceNum > choiceList.length - 1 ? choiceList.length - 1 : choiceNum;
+                return this.doReplaceToText(choiceList[choiceNum]);
             },
             "判断"(text) {
                 const choiceList = this.doTextMatchList(text);

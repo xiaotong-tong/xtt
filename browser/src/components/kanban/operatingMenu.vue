@@ -12,6 +12,12 @@
               <a href="/" class="item">首页</a>
           </li>
           <li>
+              <a href="/lian" class="item">漣の家</a>
+          </li>
+          <li>
+              <a href="/lovewithyou" class="item">恋与你</a>
+          </li>
+          <li>
               <span class="item" @click="changeImg">更换涟皮肤</span>
           </li>
       </ul>
