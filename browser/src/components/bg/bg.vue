@@ -51,7 +51,7 @@ onMounted(()=> {
   position: fixed;
   inset: 0;
   opacity: .6;
-  background-image: var(--bg-url, url(images/bg.png));
+  background-image: var(--bg-url, url(/images/bg.png));
   background-size: cover;
   z-index: -9;
 }
