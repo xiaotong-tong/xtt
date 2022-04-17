@@ -92,6 +92,7 @@ sw.*
 
 .output
 
+nginx.conf
 *.key
 *.pem
 *.crt
