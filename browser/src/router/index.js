@@ -24,6 +24,13 @@ const routes = [
         component: Live2ddemo
     }
 ];
+routes.push(...[
+    {
+        path: "/lovewithyou/",
+        name: "lovewithyou",
+        component: LoveWithYou
+    }
+]);
 
 const router = createRouter({
     history: createWebHistory(),

@@ -1,6 +1,6 @@
 :root {
     --color-blue: #26c4fb;
-    --bg-url: url(images/bg.png);
+    --bg-url: url(/images/bg.png);
     --row-dot-line: 2;
 }
 
