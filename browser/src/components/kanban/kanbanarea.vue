@@ -9,7 +9,8 @@
       @mouseout="imgMoved"
       @dblclick="operatingMenuShow"
     >
-      <kanbanimg :imgLoad="imgLoad"></kanbanimg>
+      <!-- <kanbanimg :imgLoad="imgLoad"></kanbanimg> -->
+      <kanbanLive2d :imgLoad="imgLoad"></kanbanLive2d>
     </section>
 
     <div
@@ -42,6 +43,7 @@
 <script setup>
 import { ref, reactive, onMounted, nextTick } from 'vue';
 import kanbanimg from "./img.vue";
+import kanbanLive2d from "./moc.vue";
 import operatingMenu from "./operatingMenu.vue"
 import textcontent from './textcontent.vue';
 import { showTextBrowser } from "showText"
