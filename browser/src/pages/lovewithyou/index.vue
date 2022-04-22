@@ -1,7 +1,7 @@
 <template>
-    <bg :defalutImg="defalutImg" :noMark="true"></bg>
-    <h1 class="title">恋与你</h1>
-    <!-- <kanbanarea></kanbanarea> -->
+	<bg :defalutImg="defalutImg" :noMark="true"></bg>
+	<h1 class="title">恋与你</h1>
+	<!-- <kanbanarea></kanbanarea> -->
 </template>
 
 <script setup>
@@ -13,12 +13,13 @@ const defalutImg = "lovewithyou/images/menu-bg.png"
 
 <style scoped>
 @font-face {
-    font-family: "Muyao";
-    src: url("/lovewithyou/fonts/Muyao.ttf");
+	font-family: "Muyao";
+	src: url("/lovewithyou/fonts/Muyao.ttf");
 }
+
 .title {
-    font-family: "Muyao";
-    font-size: 36px;
-    color: #DB97D5;
+	font-family: "Muyao";
+	font-size: 36px;
+	color: #DB97D5;
 }
 </style>

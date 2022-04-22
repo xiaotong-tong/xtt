@@ -1,7 +1,7 @@
 <template>
-    <bg></bg>
-    涟の家
-    <kanbanarea></kanbanarea>
+	<bg></bg>
+	涟の家
+	<kanbanarea></kanbanarea>
 </template>
 
 <script setup>
