@@ -1,57 +1,91 @@
 <template>
-	<div class="operatingMenuContainer">
+	<div class="operatingMenuContainer textborder1" :style="operatingMenuStyle" ref="textEl" v-show="isOperatingMenu"
+		@mousedown="textMove" @mousemove="textMoving" @mouseup="textMoved" @mouseout="textMoved">
 		<div class="title">
 			有什么事呢？
 		</div>
 		<div class="main">
-			<ul class="menuList">
-				<li>
-					<a href="/text" class="item">文本操作类</a>
-				</li>
-				<li>
-					<a href="/" class="item">首页</a>
-				</li>
-				<li>
-					<a href="/lian" class="item">漣の家</a>
-				</li>
-				<li>
-					<a href="/lovewithyou" class="item">恋与你</a>
-				</li>
-				<li>
-					<span class="item" @click="changeImg">更换涟皮肤</span>
-				</li>
-			</ul>
+			<tab></tab>
 			<div class="main-footer">
 				当前时间: {{ showTextBrowser("【当前时间-->>all】") }}
 			</div>
 		</div>
-		<div class="closeMenuLink" @click="closeMenu">
+		<div class="closeMenuLink" @click="closeOperatingMenu">
 			没什么事
 		</div>
 	</div>
 </template>
 
 <script setup>
+import { ref, nextTick, onMounted, reactive } from 'vue';
 import { showTextBrowser } from "showText"
-import { useStore } from "../../store/index.js"
-const store = useStore();
+import tab from './menu/tab.vue';
 
-const props = defineProps({
-	closeMenu: Function
+let isOperatingMenu = ref(false);
+
+let operatingMenuStyle = reactive({
+	top: "calc(100vh - 100px)",
+	left: "calc(100vw - 330px)",
+	cursor: "",
 })
-const closeMenu = (ev) => {
-	props.closeMenu();
-	ev.preventDefault();
+
+const textEl = ref();
+let canMove = false;
+let moveStartXY = {
+	Y: 0,
+	X: 0
+};
+
+const kanbanPosition = (...position) => {
+	if (position.length === 2) {
+		operatingMenuStyle.top = position[0];
+		operatingMenuStyle.left = position[1];
+	} else {
+		return operatingMenuStyle;
+	}
 }
-const changeImg = (ev) => {
-	store.changeBg(ev);
-	ev.preventDefault();
+const textMove = (ev) => {
+	const textPosition = textEl.value.getBoundingClientRect();
+	operatingMenuStyle.cursor = "move";
+	canMove = true;
+	moveStartXY = {
+		Y: ev.clientY - textPosition.top,
+		X: ev.clientX - textPosition.left,
+	};
 }
+const textMoving = (ev) => {
+	if (canMove) {
+		operatingMenuStyle.top = ev.clientY - moveStartXY.Y + "px";
+		operatingMenuStyle.left = ev.clientX - moveStartXY.X + "px";
+	}
+}
+const textMoved = () => {
+	canMove = false;
+	operatingMenuStyle.cursor = "";
+}
+
+const closeOperatingMenu = (ev) => {
+	isOperatingMenu.value = false;
+	ev?.preventDefault();
+}
+const openOperatingMenu = () => {
+	isOperatingMenu.value = true;
+}
+
+defineExpose({
+	kanbanPosition,
+	openOperatingMenu
+})
 </script>
 
 <style>
 .operatingMenuContainer {
+	position: absolute;
 	display: flex;
+	overflow: hidden;
+	padding: .5em;
+	font-size: 12px;
+	cursor: inherit;
 	width: 210px;
 	height: 300px;
 	flex-direction: column;
@@ -69,12 +103,6 @@ const changeImg = (ev) => {
 	margin-bottom: .5em;
 }
 
-.menuList {
-	flex: 1;
-}
-
-.main-footer {}
-
 .closeMenuLink {
 	display: list-item;
 	list-style: circle inside;
@@ -82,8 +110,7 @@ const changeImg = (ev) => {
 	margin-top: 1em;
 }
 
-.closeMenuLink:hover,
-.main .item:hover {
+.closeMenuLink:hover {
 	color: var(--color-blue);
 }
 </style>

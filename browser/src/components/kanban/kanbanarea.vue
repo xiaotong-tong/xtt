@@ -7,10 +7,7 @@
 
 	<textcontent ref="textContentEl"></textcontent>
 
-	<div class="kanbanText textborder1" v-show="isOperatingMenu" ref="operatingMenuEl" :style="operatingMenuStyle"
-		@mousedown="textMove" @mousemove="textMoving" @mouseup="imgMoved" @mouseout="imgMoved">
-		<operatingMenu :closeMenu="closeOperatingMenu"></operatingMenu>
-	</div>
+	<operatingMenu ref="operatingMenuEl"></operatingMenu>
 </template>
 
 <script setup>
@@ -35,13 +32,6 @@ let moveStartXY = {
 	Y: 0,
 	X: 0
 };
-
-let isOperatingMenu = ref(false);
-
-let operatingMenuStyle = reactive({
-	top: "calc(100vh - 100px)",
-	left: "calc(100vw - 330px)",
-})
 
 const kanbanTextLoad = () => {
 	nextTick(() => {
@@ -149,12 +139,8 @@ const kanbanShow = (entries) => {
 
 const operatingMenuShow = () => {
 	const kanbanTextStyle = textContentEl.value.kanbanPosition()
-	isOperatingMenu.value = true;
-	operatingMenuStyle.top = parseInt(kanbanTextStyle.top) - 170 + "px"
-	operatingMenuStyle.left = parseInt(kanbanTextStyle.left) - 20 + "px"
-}
-const closeOperatingMenu = () => {
-	isOperatingMenu.value = false;
+	operatingMenuEl.value.openOperatingMenu();
+	operatingMenuEl.value.kanbanPosition(parseInt(kanbanTextStyle.top) - 170 + "px", parseInt(kanbanTextStyle.left) - 20 + "px");
 }
 
 onMounted(() => {
@@ -193,14 +179,6 @@ onMounted(() => {
 </script>
 
 <style scoped>
-.kanbanText {
-	position: absolute;
-	overflow: hidden;
-	padding: .5em;
-	font-size: 12px;
-	cursor: inherit;
-}
-
 .imgArea {
 	position: fixed;
 }

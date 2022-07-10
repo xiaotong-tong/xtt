@@ -3,7 +3,6 @@ import Home from "../pages/home.vue";
 import Text from "../pages/text.vue";
 import Lian from "../pages/lian.vue";
 import LoveWithYou from "../pages/lovewithyou/index.vue";
-import Live2ddemo from "../pages/live2ddemo.vue";
 
 const routes = [
 	{
@@ -18,10 +17,6 @@ const routes = [
 		path: "/lian",
 		name: "lian",
 		component: Lian
-	}, {
-		path: "/live2d",
-		name: "live2d",
-		component: Live2ddemo
 	}
 ];
 routes.push(...[
