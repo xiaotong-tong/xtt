@@ -1,13 +1,14 @@
 {
-  "name": "showtext",
-  "version": "1.0.0",
-  "description": "",
+  "name": "xtt-msg",
+  "version": "1.0.1",
+  "description": "a text processing lib",
   "main": "showText.js",
-  "type": "commonjs",
+  "type": "module",
   "scripts": {},
-  "keywords": [],
-  "author": "xtt",
+  "keywords": ["text"],
+  "author": "xtt-nami",
   "license": "ISC",
+  "homepage": "https://github.com/xiaotong-tong/xtt/tree/master/common/showtext",
   "dependencies": {
     "marked": "^4.0.12"
   }
