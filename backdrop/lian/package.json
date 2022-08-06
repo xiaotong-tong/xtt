@@ -11,7 +11,10 @@
     "publish": "electron-forge publish",
     "lint": "echo \"No linting configured\""
   },
-  "keywords": ["lian", "xtt"],
+  "keywords": [
+    "lian",
+    "xtt"
+  ],
   "author": {
     "name": "xtt",
     "email": "wtt150249@gmail.com"
@@ -19,7 +22,9 @@
   "license": "MIT",
   "config": {
     "forge": {
-      "packagerConfig": {},
+      "packagerConfig": {
+        "icon": "lian.ico"
+      },
       "makers": [
         {
           "name": "@electron-forge/maker-squirrel",
@@ -45,7 +50,8 @@
     }
   },
   "dependencies": {
-    "electron-squirrel-startup": "^1.0.0"
+    "electron-squirrel-startup": "^1.0.0",
+    "xtt-msg": "^1.0.0"
   },
   "devDependencies": {
     "@electron-forge/cli": "^6.0.0-beta.64",

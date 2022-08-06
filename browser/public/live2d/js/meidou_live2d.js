@@ -9941,9 +9941,9 @@ var LAppModel = (function (_super) {
         if (this._expressionManager != null) {
             this._expressionManager.updateMotion(this._model, deltaTimeSeconds);
         }
-        this._model.addParameterValueById(this._idParamAngleX, this._dragX * 30);
-        this._model.addParameterValueById(this._idParamAngleY, this._dragY * 30);
-        this._model.addParameterValueById(this._idParamAngleZ, this._dragX * this._dragY * -30);
+        this._model.addParameterValueById(this._idParamAngleX, this._dragX * 10);
+        this._model.addParameterValueById(this._idParamAngleY, this._dragY * 10);
+        this._model.addParameterValueById(this._idParamAngleZ, this._dragX * this._dragY * -10);
         this._model.addParameterValueById(this._idParamBodyAngleX, this._dragX * 10);
         this._model.addParameterValueById(this._idParamEyeBallX, this._dragX);
         this._model.addParameterValueById(this._idParamEyeBallY, this._dragY);

@@ -8,11 +8,9 @@
  *          和 showTextBrowser 方法同样的处理过程, 在输出结果时, 使用 marked 库对文本进行了一次 markdown语法解析
  * */
 import { marked } from "marked";
-import BrowserReplaceText from "./BrowserReplaceText.js";
-const ReplaceText = new BrowserReplaceText();
+import ReplaceText from "./src/BrowserReplaceText.js";
 
 class ShowText {
-	errorOutput;
 	#backText;
 
 	constructor() {
@@ -22,7 +20,7 @@ class ShowText {
 		this.doTextList = Object.assign({
 			"文本-反转文本"(text) {
 				const type = text.match(/-->>([\s\S]*)】/);
-				return ReplaceText.getReverseText(this.doReplaceToText(type[1]));
+				return ReplaceText.reverseText(this.doReplaceToText(type[1]));
 			},
 			"文本-取文本左"(text) {
 				const textState = this.doTextMatchList(text);
@@ -76,6 +74,10 @@ class ShowText {
 				const type = this.doTextMatchList(text);
 				return ReplaceText.getWeightedRandom(this.doReplaceToText(type[0]).split(/[,，]/), this.doReplaceToText(type[1]).split(/[,，]/));
 			},
+			"非重随机数"(text) {
+				const type = this.doTextMatchList(text);
+				return ReplaceText.nonrandom(this.doReplaceToText(type[0]), this.doReplaceToText(type[1]), this.doReplaceToText(type[2]));
+			},
 			"变量"(text) {
 				const type = this.doTextMatchList(text);
 				return type.length === 1 ? ReplaceText.getVariable(this.doReplaceToText(type[0])) : ReplaceText.setVariable(this.doReplaceToText(type[0]), this.doReplaceToText(type[1]));
@@ -128,16 +130,20 @@ class ShowText {
 		let resText = text;
 
 		if (/【[\s\S]*】/.test(text)) {
-			text = text.replace(/\s+(?=【)/g, "").replace(/(?<=】)\s+/g, "");
-			resText = this.doReplaceToText(text);
+			try {
+				text = text.replace(/\s+(?=【)/g, "").replace(/(?<=】)\s+/g, "");
+				resText = this.doReplaceToText(text);
 
-			/**
-			 * 【】解析的内容如果需要格外添加 html标签的话，会暂时返回 {{{}}} 格式内容
-			 * doReplaceToHTML 会将 {{{}}}格式转为对应的 html标签文本
-			 * */
-			resText = this.doReplaceToHTML(resText)
+				/**
+				 * 【】解析的内容如果需要格外添加 html标签的话，会暂时返回 {{{}}} 格式内容
+				 * doReplaceToHTML 会将 {{{}}}格式转为对应的 html标签文本
+				 * */
+				resText = this.doReplaceToHTML(resText)
+			} catch (e) {
+				resText = e;
+			}
 		}
-		return this.errorOutput || resText;
+		return resText;
 	}
 	doReplaceToText(text) {
 		/**
@@ -161,14 +167,12 @@ class ShowText {
 					}
 					balance--;
 					if (balance < 0) {
-						this.errorOutput = 'missing "【"';
-						return text;
+						throw 'missing "【"';
 					}
 				}
 			}
 			if (balance > 0) {
-				this.errorOutput = 'missing "】"';
-				return text;
+				throw 'missing "】"';
 			}
 
 			matches?.forEach(matchText => {
