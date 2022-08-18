@@ -16,111 +16,132 @@ class ShowText {
 	constructor() {
 		/**
 		 * 文本解析处
-		*/
-		this.doTextList = Object.assign({
-			"文本-反转文本"(text) {
-				const type = text.match(/-->>([\s\S]*)】/);
-				return ReplaceText.reverseText(this.doReplaceToText(type[1]));
+		 */
+		this.doTextList = Object.assign(
+			{
+				"文本-反转文本"(text) {
+					const type = this.doTextMatchList(text);
+					return ReplaceText.reverseText(type[0]);
+				},
+				"文本-取文本左"(text) {
+					const textState = this.doTextMatchList(text);
+					return ReplaceText.getTextLeft(textState[0], textState[1]);
+				},
+				"文本-取文本右"(text) {
+					const textState = this.doTextMatchList(text);
+					return ReplaceText.getTextRight(textState[0], textState[1]);
+				},
+				"文本-取中间"(text) {
+					const textState = this.doTextMatchList(text);
+					return ReplaceText.getTextCenter(
+						textState[0],
+						textState[1],
+						textState[2]
+					);
+				},
+				"文本-替换"(text) {
+					const textState = this.doTextMatchList(text);
+					return textState[0].replaceAll(textState[1], textState[2]);
+				},
+				"文本-取出数字"(text) {
+					const textState = this.doTextMatchList(text);
+					return ReplaceText.getTextNum(textState[0]);
+				},
+				当前时间(text) {
+					const type = this.doTextMatchList(text);
+					return ReplaceText.getDate(+new Date(), type && type[0]);
+				},
+				返回(text) {
+					const type = this.doTextMatchList(text);
+					this.#backText = type[0];
+					return "";
+				},
+				选择(text) {
+					const choiceList = this.doTextMatchList(text);
+					let choiceNum = parseInt(
+						ReplaceText.getTextNum(choiceList[0])
+					);
+					choiceNum =
+						choiceNum > choiceList.length - 1
+							? choiceList.length - 1
+							: choiceNum;
+					return choiceList[choiceNum];
+				},
+				判断(text) {
+					const choiceList = this.doTextMatchList(text);
+					// 此处使用了 Function() 来处理用户输入的数据
+					return Function("return " + choiceList[0])()
+						? choiceList[1]
+						: choiceList[2];
+				},
+				计算(text) {
+					// const type = text.match(/-->>([\s\S]*)】/);
+					const type = this.doTextMatchList(text);
+					return Function("return " + type[0])();
+				},
+				随机数(text) {
+					const minMax = this.doTextMatchList(text);
+					return ReplaceText.getRandom(minMax[0], minMax[1]);
+				},
+				权重随机数(text) {
+					const type = this.doTextMatchList(text);
+					return ReplaceText.getWeightedRandom(
+						type[0].split(/[,，]/),
+						type[1].split(/[,，]/)
+					);
+				},
+				非重随机数(text) {
+					const type = this.doTextMatchList(text);
+					return ReplaceText.nonrandom(type[0], type[1], type[2]);
+				},
+				变量(text) {
+					const type = this.doTextMatchList(text);
+					return type.length === 1
+						? ReplaceText.getVariable(type[0])
+						: ReplaceText.setVariable(type[0], type[1]);
+				}
 			},
-			"文本-取文本左"(text) {
-				const textState = this.doTextMatchList(text);
-				return ReplaceText.getTextLeft(this.doReplaceToText(textState[0]), this.doReplaceToText(textState[1]));
-			},
-			"文本-取文本右"(text) {
-				const textState = this.doTextMatchList(text);
-				return ReplaceText.getTextRight(this.doReplaceToText(textState[0]), this.doReplaceToText(textState[1]));
-			},
-			"文本-取中间"(text) {
-				const textState = this.doTextMatchList(text);
-				return ReplaceText.getTextCenter(this.doReplaceToText(textState[0]), this.doReplaceToText(textState[1]), this.doReplaceToText(textState[2]));
-			},
-			"文本-替换"(text) {
-				const textState = this.doTextMatchList(text);
-				return this.doReplaceToText(textState[0]).replace(this.doReplaceToText(textState[1]), this.doReplaceToText(textState[2]));
-			},
-			"文本-取出数字"(text) {
-				const textState = this.doTextMatchList(text);
-				return ReplaceText.getTextNum(this.doReplaceToText(textState[0]));
-			},
-			"当前时间"(text) {
-				const type = text.match(/-->>([\s\S]*)】/);
-				return ReplaceText.getDate(+new Date(), type && this.doReplaceToText(type[1]));
-			},
-			"返回"(text) {
-				const type = text.match(/-->>([\s\S]*)】/);
-				this.#backText = this.doReplaceToText(type[1]);
-				return ''
-			},
-			"选择"(text) {
-				const choiceList = this.doTextMatchList(text);
-				let choiceNum = parseInt(ReplaceText.getTextNum(this.doReplaceToText(choiceList[0])));
-				choiceNum = choiceNum > choiceList.length - 1 ? choiceList.length - 1 : choiceNum;
-				return this.doReplaceToText(choiceList[choiceNum]);
-			},
-			"判断"(text) {
-				const choiceList = this.doTextMatchList(text);
-				// 此处使用了 Function() 来处理用户输入的数据， 可以xss注入
-				return Function("return " + this.doReplaceToText(choiceList[0]))() ? this.doReplaceToText(choiceList[1]) : this.doReplaceToText(choiceList[2]);
-			},
-			"计算"(text) {
-				const type = text.match(/-->>([\s\S]*)】/);
-				return (Function("return " + this.doReplaceToText(type[1]) ))();
-			},
-			"随机数"(text) {
-				const minMax = this.doTextMatchList(text);
-				return ReplaceText.getRandom(this.doReplaceToText(minMax[0]), this.doReplaceToText(minMax[1]));
-			},
-			"权重随机数"(text) {
-				const type = this.doTextMatchList(text);
-				return ReplaceText.getWeightedRandom(this.doReplaceToText(type[0]).split(/[,，]/), this.doReplaceToText(type[1]).split(/[,，]/));
-			},
-			"非重随机数"(text) {
-				const type = this.doTextMatchList(text);
-				return ReplaceText.nonrandom(this.doReplaceToText(type[0]), this.doReplaceToText(type[1]), this.doReplaceToText(type[2]));
-			},
-			"变量"(text) {
-				const type = this.doTextMatchList(text);
-				return type.length === 1 ? ReplaceText.getVariable(this.doReplaceToText(type[0])) : ReplaceText.setVariable(this.doReplaceToText(type[0]), this.doReplaceToText(type[1]));
+			{
+				"文本-注音"(text) {
+					const textState = this.doTextMatchList(text);
+					return `{{{注音-${textState[0]}-${textState[1]}}}}`;
+				},
+				"文本-文字颜色"(text) {
+					const textState = this.doTextMatchList(text);
+					return `{{{文字颜色-${textState[0]}-${textState[1]}}}}`;
+				},
+				"文本-黑幕"(text) {
+					const textState = this.doTextMatchList(text);
+					return `{{{黑幕-${textState[0]}}}}`;
+				},
+				换行() {
+					return "{{{换行}}}";
+				},
+				空格() {
+					return "{{{空格}}}";
+				}
 			}
-		}, {
-			"文本-注音"(text) {
-				const textState = this.doTextMatchList(text);
-				return `{{{注音-${this.doReplaceToText(textState[0])}-${this.doReplaceToText(textState[1])}}}}`;
-			},
-			"文本-文字颜色"(text) {
-				const textState = this.doTextMatchList(text);
-				return `{{{文字颜色-${this.doReplaceToText(textState[0])}-${this.doReplaceToText(textState[1])}}}}`;
-			},
-			"文本-黑幕"(text) {
-				const textState = this.doTextMatchList(text);
-				return `{{{黑幕-${this.doReplaceToText(textState[0])}}}}`;
-			},
-			"换行"() {
-				return "{{{换行}}}"
-			},
-			"空格"() {
-				return "{{{空格}}}"
-			},
-		});
+		);
 		this.doHTMLList = {
-			"注音"(text) {
+			注音(text) {
 				const type = this.doHTMLMatchList(text);
-				return ReplaceText.getRubyHTML(this.doReplaceToHTML(type[0]), type[1]);
+				return ReplaceText.getRubyHTML(type[0], type[1]);
 			},
-			"文字颜色"(text) {
+			文字颜色(text) {
 				const type = this.doHTMLMatchList(text);
-				return ReplaceText.setTextColor(this.doReplaceToHTML(type[0]), type[1]);
+				return ReplaceText.setTextColor(type[0], type[1]);
 			},
-			"黑幕"(text) {
+			黑幕(text) {
 				const type = this.doHTMLMatchList(text);
-				return ReplaceText.getHeimuHTML(this.doReplaceToHTML(type[0]));
+				console.log(type);
+				return ReplaceText.getHeimuHTML(type[0]);
 			},
-			"换行"() {
-				return "<br />"
+			换行() {
+				return "<br />";
 			},
-			"空格"() {
-				return "&nbsp;"
-			},
+			空格() {
+				return "&nbsp;";
+			}
 		};
 	}
 	showText(text) {
@@ -131,14 +152,16 @@ class ShowText {
 
 		if (/【[\s\S]*】/.test(text)) {
 			try {
-				text = text.replace(/\s+(?=【)/g, "").replace(/(?<=】)\s+/g, "");
+				text = text
+					.replace(/\s+(?=【)/g, "")
+					.replace(/(?<=】)\s+/g, "");
 				resText = this.doReplaceToText(text);
 
 				/**
 				 * 【】解析的内容如果需要格外添加 html标签的话，会暂时返回 {{{}}} 格式内容
 				 * doReplaceToHTML 会将 {{{}}}格式转为对应的 html标签文本
 				 * */
-				resText = this.doReplaceToHTML(resText)
+				resText = this.doReplaceToHTML(resText);
 			} catch (e) {
 				resText = e;
 			}
@@ -153,7 +176,8 @@ class ShowText {
 		if (/【[\s\S]*】/.test(text)) {
 			let parts = text.match(/[【】]|[^【】]+/g),
 				matches = [],
-				balance = 0, index = 0;
+				balance = 0,
+				index = 0;
 
 			for (let i = 0; i < parts.length; i++) {
 				if (parts[i] === "【") {
@@ -175,11 +199,13 @@ class ShowText {
 				throw 'missing "】"';
 			}
 
-			matches?.forEach(matchText => {
-				text = text.replace(matchText, match => this.doTextMatch(match));
+			matches?.forEach((matchText) => {
+				text = text.replace(matchText, (match) =>
+					this.doTextMatch(match)
+				);
 				if (this.#backText) {
 					text = this.#backText;
-					this.#backText = '';
+					this.#backText = "";
 				}
 			});
 		}
@@ -189,7 +215,8 @@ class ShowText {
 		if (/{{{[\s\S]*}}}/.test(text)) {
 			let parts = text.match(/[\{\}]{3}|[^\{\}]+/g),
 				matches = [],
-				balance = 0, index = 0;
+				balance = 0,
+				index = 0;
 
 			for (let i = 0; i < parts.length; i++) {
 				if (parts[i] === "{{{") {
@@ -205,13 +232,18 @@ class ShowText {
 				}
 			}
 
-			matches?.forEach(matchText => text = text.replace(matchText, match => this.doHTMLMatch(match)));
+			matches?.forEach(
+				(matchText) =>
+					(text = text.replace(matchText, (match) =>
+						this.doHTMLMatch(match)
+					))
+			);
 		}
 		return text;
 	}
 	doTextMatch(match) {
-		/** 
-		 * 根据文本的内容 查找是否有对应的解析，如果有就调用，没有就返回文本 
+		/**
+		 * 根据文本的内容 查找是否有对应的解析，如果有就调用，没有就返回文本
 		 * */
 		const type = match.match(/【([\s\S]*?)(?:-->>|】)/);
 		if (type && this.doTextList[type[1]]) {
@@ -235,8 +267,10 @@ class ShowText {
 		 * 如 【选择-->>2-->>【随机数-->>1-->>5】-->>【随机数-->>1-->>10】】
 		 * 将返回数组 ["【随机数-->>1-->>5】", "【随机数-->>1-->>10】"]
 		 * */
-		let list = [], balance = 0, cacheList = [];
-		type.forEach(item => {
+		let list = [],
+			balance = 0,
+			cacheList = [];
+		type.forEach((item) => {
 			if (item.match(new RegExp(left + "|" + right))) {
 				balance += (item.match(new RegExp(left, "g")) || []).length;
 				balance -= (item.match(new RegExp(right, "g")) || []).length;
@@ -251,28 +285,34 @@ class ShowText {
 				list.push(item);
 			}
 		});
-		return list;
+		return list.map((v) =>
+			left === "【" ? this.doReplaceToText(v) : this.doReplaceToHTML(v)
+		);
 	}
 	doTextMatchList(text) {
 		const type = text.match(/(?<=-->>)[\s\S]*?(?=-->>|】$)/g);
-		if (!type) { return [text] }
+		if (!type) {
+			return;
+		}
 
 		return this.#getMatchList(type, "-->>", "【", "】");
 	}
 	doHTMLMatchList(text) {
 		const type = text.match(/(?<=-)[\s\S]*?(?=-|(?:}}})$)/g);
-		if (!type) { return [text] }
+		if (!type) {
+			return [text];
+		}
 
 		return this.#getMatchList(type, "-", "{{{", "}}}");
 	}
 }
 
 export const showTextBrowser = (text) => {
-	const Text = new ShowText;
+	const Text = new ShowText();
 	return Text.showText(text);
-}
+};
 
 export const showTextWithMarked = (text) => {
-	const Text = new ShowText;
+	const Text = new ShowText();
 	return marked.parse(Text.showText(text));
-}
+};
