@@ -3,11 +3,13 @@ const path = require('path');
 
 class WindowsManager {
 	static #live2d;
-	static #msg
+	static #msg;
+	static #main;
 
 	static init() {
 		this.loadLive2d();
 		this.loadMsg();
+		this.loadMain();
 	}
 
 	static loadLive2d() {
@@ -66,6 +68,26 @@ class WindowsManager {
 		this.#msg.hide();
 		// 打开调试面板
 		// this.#msg.webContents.openDevTools();
+	}
+
+	static loadMain() {
+		this.#main = new BrowserWindow({
+			width: 800,
+			height: 500,
+			frame: false,
+			resizable: false,
+			webPreferences: {
+				// preload: path.join(__dirname, 'msg/msgLoad.js'),
+				nodeIntegration: true
+			},
+		});
+
+		this.#main.setSkipTaskbar(true);
+		this.#main.setAlwaysOnTop(true);
+		this.#main.setIgnoreMouseEvents(false, {forward:true});
+		this.#main.loadFile(path.join(__dirname, 'main/index.html'));
+		// 打开调试面板
+		this.#main.webContents.openDevTools();
 	}
 
 	static getWinID(winName = "live2d") {

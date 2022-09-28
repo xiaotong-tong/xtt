@@ -34,8 +34,8 @@ class ReplaceText extends XttJS {
 	}
 	static nonrandom(min = 1, max = 10, variable) {
 		if ((min = super.getTextNum(min)) === (max = super.getTextNum(max))) {
-			return max;
-		} // 如果两值相等则返回
+			return max; // 如果两值相等则返回
+		}
 		if (min > max) {
 			let temp = min;
 			min = max;
@@ -66,7 +66,7 @@ class ReplaceText extends XttJS {
 				"星期四",
 				"星期五",
 				"星期六",
-				"星期日"
+				"星期日",
 			];
 
 		if (type) {
@@ -76,14 +76,24 @@ class ReplaceText extends XttJS {
 				}`;
 			}
 
-			return type
-				.replace("年", year)
-				.replace("月", month)
-				.replace("日", day)
-				.replace("时", hour)
-				.replace("分", minutes)
-				.replace("秒", seconds)
-				.replace("星期", weekList[week - 1]);
+			return type.replace(/年|月|日|时|分|秒|星期/g, (value) => {
+				switch (value) {
+					case "年":
+						return year;
+					case "月":
+						return month;
+					case "日":
+						return day;
+					case "时":
+						return hour;
+					case "分":
+						return minutes;
+					case "秒":
+						return seconds;
+					case "星期":
+						return weekList[week - 1];
+				}
+			});
 		}
 		return `${year}-${month}-${day} ${hour}:${minutes}:${seconds}`;
 	}
