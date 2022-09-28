@@ -1,6 +1,6 @@
 {
 	"name": "xtt-msg",
-	"version": "1.0.2",
+	"version": "1.0.3",
 	"description": "a text processing lib",
 	"main": "showText.js",
 	"type": "module",
@@ -10,8 +10,5 @@
 	],
 	"author": "xtt-nami",
 	"license": "ISC",
-	"homepage": "https://github.com/xiaotong-tong/xtt/tree/master/common/showtext",
-	"dependencies": {
-		"marked": "^4.0.12"
-	}
+	"homepage": "https://github.com/xiaotong-tong/xtt/tree/master/common/showtext"
 }
