@@ -1,1 +1,0 @@
-const live2d = document.querySelector("#live2d")
